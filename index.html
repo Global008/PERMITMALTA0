@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecurePIN Verification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --dark-bg: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-muted: #cbd5e1;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: 
+                radial-gradient(at 47% 33%, rgba(103, 126, 234, 0.15) 0, transparent 59%),
+                radial-gradient(at 82% 65%, rgba(118, 75, 162, 0.15) 0, transparent 55%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            transition: all 0.4s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            background: var(--primary-gradient);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-icon i {
+            font-size: 28px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #f8fafc, #cbd5e1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tagline {
+            color: var(--text-muted);
+            font-weight: 300;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+
+        .pin-input-container {
+            margin-bottom: 30px;
+        }
+
+        .pin-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .pin-input {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .pin-digit {
+            width: 55px;
+            height: 65px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .pin-digit:focus {
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pin-digit.filled {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .instructions {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 17px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .result-container {
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 36px;
+        }
+
+        .success .result-icon {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+        }
+
+        .error .result-icon {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error-color);
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-message {
+            font-size: 18px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #667eea;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .pulse-error {
+            animation: pulse-error 0.5s ease-in-out;
+        }
+
+        @keyframes pulse-error {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+            padding: 20px 0;
+        }
+
+        .pin-examples {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        .pin-examples h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pin-examples ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .pin-examples li {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 30px 20px;
+            }
+            
+            .pin-digit {
+                width: 50px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            .logo-text {
+                font-size: 24px;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pin-digit {
+                width: 45px;
+                height: 55px;
+                font-size: 22px;
+            }
+            
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .pin-examples ul {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glass-card">
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="logo-text">SecurePIN</div>
+                </div>
+                <p class="tagline">Check Your Permit</p>
+            </div>
+
+            <div class="pin-input-container">
+                <label class="pin-label">Enter your 6-digit PIN</label>
+                <div class="pin-input">
+                    <!-- PIN digits will be generated by JavaScript -->
+                </div>
+                <p class="instructions">Type your PIN</p>
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn btn-primary" id="verifyBtn">
+                    <i class="fas fa-check-circle"></i> Verify PIN
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    <i class="fas fa-undo"></i> Clear
+                </button>
+            </div>
+
+    
+        </div>
+
+        <div class="glass-card">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="instructions">Verifying , please wait...</p>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Secure Verification System</p>
+        <p>PIN Validation</p>
+    </div>
+
+    <script>
+        // PIN database
+        const pinDatabase = {
+            "454952": "<h3>DURJOY VAKTA</h3> A09884627 <br> Il-viża tiegħek ġiet approvata; int mistieden tiġi Malta..",
+        };
+
+        // DOM elements
+        let pinInputContainer = document.querySelector('.pin-input');
+        let verifyBtn = document.getElementById('verifyBtn');
+        let clearBtn = document.getElementById('clearBtn');
+        let resultContainer = document.getElementById('resultContainer');
+        let loading = document.getElementById('loading');
+
+        // PIN input fields (6 digits)
+        let pinDigits = [];
+
+        // Initialize PIN input fields
+        function initializePinInput() {
+            pinInputContainer.innerHTML = '';
+            pinDigits = [];
+            
+            for (let i = 0; i < 6; i++) {
+                const input = document.createElement('input');
+                input.type = 'tel';
+                input.maxLength = 1;
+                input.className = 'pin-digit';
+                input.setAttribute('inputmode', 'numeric');
+                input.setAttribute('pattern', '[0-9]*');
+                input.setAttribute('autocomplete', 'off');
+                
+                // Add event listeners
+                input.addEventListener('input', (e) => handlePinInput(e, i));
+                input.addEventListener('keydown', (e) => handlePinKeyDown(e, i));
+                input.addEventListener('paste', handlePinPaste);
+                
+                pinInputContainer.appendChild(input);
+                pinDigits.push(input);
+            }
+            
+            // Focus first digit
+            pinDigits[0].focus();
+        }
+
+        // Handle PIN input
+        function handlePinInput(e, index) {
+            const value = e.target.value;
+            
+            // If a digit is entered, move to next field
+            if (value && index < 5) {
+                pinDigits[index + 1].focus();
+            }
+            
+            // Update filled class
+            if (value) {
+                e.target.classList.add('filled');
+            } else {
+                e.target.classList.remove('filled');
+            }
+        }
+
+        // Handle keyboard navigation in PIN fields
+        function handlePinKeyDown(e, index) {
+            // Handle backspace
+            if (e.key === 'Backspace') {
+                if (!pinDigits[index].value && index > 0) {
+                    // If current field is empty, go to previous field
+                    pinDigits[index - 1].focus();
+                    pinDigits[index - 1].value = '';
+                    pinDigits[index - 1].classList.remove('filled');
+                }
+            }
+            
+            // Handle arrow keys
+            if (e.key === 'ArrowLeft' && index > 0) {
+                pinDigits[index - 1].focus();
+            }
+            if (e.key === 'ArrowRight' && index < 5) {
+                pinDigits[index + 1].focus();
+            }
+            
+            // Handle Enter key for verification
+            if (e.key === 'Enter') {
+                verifyPin();
+            }
+            
+            // Only allow numeric keys
+            if (!/^[0-9]$/.test(e.key) && 
+                !['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+                e.preventDefault();
+            }
+        }
+
+        // Handle paste event for PIN
+        function handlePinPaste(e) {
+            e.preventDefault();
+            const pasteData = e.clipboardData.getData('text');
+            const numbers = pasteData.replace(/\D/g, '').split('').slice(0, 6);
+            
+            numbers.forEach((num, index) => {
+                if (pinDigits[index]) {
+                    pinDigits[index].value = num;
+                    pinDigits[index].classList.add('filled');
+                }
+            });
+            
+            // Focus the next empty field or last field
+            const nextEmptyIndex = numbers.length < 6 ? numbers.length : 5;
+            if (pinDigits[nextEmptyIndex]) {
+                pinDigits[nextEmptyIndex].focus();
+            }
+        }
+
+        // Get the complete PIN from input fields
+        function getPin() {
+            return pinDigits.map(input => input.value).join('');
+        }
+
+        // Verify the entered PIN
+        function verifyPin() {
+            const pin = getPin();
+            
+            // Check if all digits are filled
+            if (pin.length < 6) {
+                showError('Please enter a complete 6-digit PIN');
+                return;
+            }
+            
+            // Show loading animation
+            loading.classList.add('show');
+            resultContainer.classList.remove('show');
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                loading.classList.remove('show');
+                
+                // Check if PIN exists in database
+                if (pinDatabase[pin]) {
+                    showSuccess(pinDatabase[pin]);
+                } else {
+                    showError('Invalid PIN. Please try again.');
+                }
+            }, 1200);
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            resultContainer.className = 'result-container success show';
+            resultContainer.innerHTML = `
+                <div class="result-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="result-title">Congresso!</h2>
+                <p class="result-message">${message}</p>
+            `;
+            
+            // Add success animation to the card
+            document.querySelector('.glass-card').style.boxShadow = '0 15px 35px rgba(16, 185, 129, 0.2)';
+            
+            // Reset shadow after animation
+            setTimeout(() => {
+                document.querySelector('.glass-card').style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.2)';
+            }, 2000);
+        }
+
+        // Show error message
+        function showError(message) {
+            resultContainer.className = 'result-container error show';
+            resultContainer.innerHTML = `
+                <div class="result-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h2 class="result-title">Verification Failed</h2>
+                <p class="result-message">${message}</p>
+            `;
+            
+            // Add shake animation to PIN input
+            pinInputContainer.classList.add('shake');
+            
+            // Add error glow to PIN fields
+            pinDigits.forEach(digit => {
+                digit.classList.add('pulse-error');
+            });
+            
+            // Remove animations after they complete
+            setTimeout(() => {
+                pinInputContainer.classList.remove('shake');
+                pinDigits.forEach(digit => {
+                    digit.classList.remove('pulse-error');
+                });
+            }, 500);
+        }
+
+        // Clear all PIN fields
+        function clearPin() {
+            pinDigits.forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            
+            // Hide result
+            resultContainer.classList.remove('show');
+            
+            // Focus first field
+            pinDigits[0].focus();
+        }
+
+        // Event listeners
+        verifyBtn.addEventListener('click', verifyPin);
+        clearBtn.addEventListener('click', clearPin);
+
+        // Add Enter key listener to the whole document
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !loading.classList.contains('show')) {
+                verifyPin();
+            }
+        });
+
+        // Initialize the app
+        initializePinInput();
+    </script>
+</body>
+
+</html>
